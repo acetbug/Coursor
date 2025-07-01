@@ -6,8 +6,6 @@ import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 /** Comment desc: 学生对课程的评论信息
   * @param id:
   *   String (评论的唯一ID)
-  * @param studentId:
-  *   String (发表评论的学生ID)
   * @param teacherId:
   *   String (课程的教师ID)
   * @param subjectId:
@@ -18,7 +16,6 @@ import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 
 case class Comment(
     id: String,
-    studentId: String,
     teacherId: String,
     subjectId: String,
     content: String

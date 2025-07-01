@@ -35,9 +35,8 @@ object API:
 
   given [T: Decoder]: ResponseHandler[T] with
     def handle(response: Response[IO]): IO[T] = {
-      response.asJsonDecode[T].flatMap {
+      response.asJsonDecode[T].flatMap:
         IO(_)
-      }
     }
 
   private var client: Option[Client[IO]] = None
@@ -50,11 +49,9 @@ object API:
       .withIdleConnectionTime(30.seconds)
       .build
 
-    clientResource.use { httpClient =>
-      IO {
+    clientResource.use: httpClient =>
+      IO:
         client = Some(httpClient)
-      }
-    }
   }
 
   def send[T: Decoder, A <: API[T]: Encoder](message: A): IO[T] =
