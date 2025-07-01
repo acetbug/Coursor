@@ -6,18 +6,18 @@ import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 /** User desc: 用户信息，包括角色、部门等信息
   * @param id:
   *   String (用户的唯一ID)
-  * @param name:
-  *   String (用户姓名)
   * @param password:
   *   String (用户密码，加密后)
+  * @param name:
+  *   String (用户姓名)
   * @param userRole:
   *   UserRole (用户角色，可能是学生、老师或管理员)
   */
 
 case class User(
     id: String,
-    name: String,
     password: String,
+    name: String,
     userRole: UserRole
 )
 
@@ -30,7 +30,7 @@ enum UserRole:
   case Teacher // 老师
   case Admin // 管理员
 
-object UserRole:
+case object UserRole:
   given encode: Encoder[UserRole] =
     Encoder.encodeString.contramap[UserRole](_.toString)
   given decode: Decoder[UserRole] = Decoder.decodeString.emap(fromString)

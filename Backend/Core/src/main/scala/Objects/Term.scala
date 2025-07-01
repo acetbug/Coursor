@@ -25,12 +25,11 @@ case object Term:
 enum TermPhase:
   case NotStarted // 尚未开始
   case PreSelection // 预选阶段
-  case Lottery // 抽签阶段
   case MainSelection // 主选阶段
   case MidTermWithdrawal // 期中退课阶段
   case Confirmed // 确认阶段
 
-object TermPhase:
+case object TermPhase:
   given Encoder[TermPhase] = Encoder.encodeString.contramap(_.toString)
   given Decoder[TermPhase] = Decoder.decodeString.emap(fromString)
 

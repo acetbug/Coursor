@@ -39,7 +39,7 @@ enum StudyStage:
   case Senior_1 // 大四上学期
   case Senior_2 // 大四下学期
 
-object StudyStage:
+case object StudyStage:
   given encode: Encoder[StudyStage] =
     Encoder.encodeString.contramap[StudyStage](_.toString)
   given decode: Decoder[StudyStage] = Decoder.decodeString.emap(fromString)

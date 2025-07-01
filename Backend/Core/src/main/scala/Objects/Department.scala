@@ -17,7 +17,7 @@ case class Department(
     name: String
 )
 
-object Department:
+case object Department:
   given Encoder[Department] = deriveEncoder
   given Decoder[Department] = deriveDecoder
 
@@ -42,7 +42,7 @@ case class DepartmentSubjectRecommendation(
     level: Int // TODO: 推荐级别的具体定义
 )
 
-object DepartmentSubjectRecommendation:
+case object DepartmentSubjectRecommendation:
   given Encoder[DepartmentSubjectRecommendation] =
     deriveEncoder
   given Decoder[DepartmentSubjectRecommendation] =

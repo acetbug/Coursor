@@ -30,6 +30,6 @@ case class Course(
     capacity: Int
 )
 
-object Course:
+case object Course:
   given Encoder[Course] = deriveEncoder
   given Decoder[Course] = deriveDecoder
