@@ -7,4 +7,4 @@ import Objects.StudyStage
 case class QueryStudyStageMessage(
     studentId: String,
     termId: String
-) extends API[StudyStage](StudyService)
+) extends API[StudyStage](StudyService, "QueryStudyStageMessage")

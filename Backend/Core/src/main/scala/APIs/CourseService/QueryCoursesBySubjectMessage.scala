@@ -6,4 +6,4 @@ import Objects.Course
 
 case class QueryCoursesBySubjectMessage(
     subjectId: String
-) extends API[List[Course]](CourseService)
+) extends API[List[Course]](CourseService, "QueryCoursesBySubjectMessage")

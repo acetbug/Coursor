@@ -7,4 +7,4 @@ import Objects.User
 case class UpdateUserMessage(
     adminToken: String,
     user: User
-) extends API[String](UserService)
+) extends API[Unit](UserService, "UpdateUserMessage")

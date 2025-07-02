@@ -7,4 +7,4 @@ import Objects.StudyStage
 case class DeleteStudyRecordMessage(
     studentToken: String,
     studyRecordId: String
-) extends API[String](StudyService)
+) extends API[Unit](StudyService, "DeleteStudyRecordMessage")

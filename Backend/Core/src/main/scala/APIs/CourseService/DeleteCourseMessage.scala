@@ -6,4 +6,4 @@ import Global.ServiceCenter.CourseService
 case class DeleteCourseMessage(
     teacherToken: String,
     courseId: String
-) extends API[String](CourseService)
+) extends API[Unit](CourseService, "DeleteCourseMessage")

@@ -7,4 +7,4 @@ import Objects.StudyRecord
 case class UpdateStudyRecordMessage(
     studentToken: String,
     studyRecord: StudyRecord
-) extends API[String](StudyService)
+) extends API[String](StudyService, "UpdateStudyRecordMessage")

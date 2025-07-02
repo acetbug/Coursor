@@ -6,4 +6,4 @@ import Objects.StudyRecord
 
 case class QueryStudyRecordsMessage(
     studentId: String
-) extends API[List[StudyRecord]](StudyService)
+) extends API[List[StudyRecord]](StudyService, "QueryStudyRecordsMessage")

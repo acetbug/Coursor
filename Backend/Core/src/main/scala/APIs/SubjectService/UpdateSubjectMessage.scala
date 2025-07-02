@@ -7,4 +7,4 @@ import Objects.Subject
 case class UpdateSubjectMessage(
     adminToken: String,
     subject: Subject
-) extends API[String](SubjectService)
+) extends API[String](SubjectService, "UpdateSubjectMessage")

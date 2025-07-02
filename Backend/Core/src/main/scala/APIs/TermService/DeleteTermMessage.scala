@@ -6,4 +6,4 @@ import Global.ServiceCenter.TermService
 case class DeleteTermMessage(
     adminToken: String,
     termId: String
-) extends API[String](TermService)
+) extends API[Unit](TermService, "DeleteTermMessage")

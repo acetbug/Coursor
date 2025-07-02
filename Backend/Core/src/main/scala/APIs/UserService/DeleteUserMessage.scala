@@ -6,4 +6,4 @@ import Global.ServiceCenter.UserService
 case class DeleteUserMessage(
     adminToken: String,
     userId: String
-) extends API[String](UserService)
+) extends API[Unit](UserService, "DeleteUserMessage")

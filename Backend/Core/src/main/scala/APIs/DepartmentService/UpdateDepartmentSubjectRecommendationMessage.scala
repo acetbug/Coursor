@@ -7,4 +7,7 @@ import Objects.DepartmentSubjectRecommendation
 case class UpdateDepartmentSubjectRecommendationMessage(
     adminToken: String,
     departmentSubjectRecommendation: DepartmentSubjectRecommendation
-) extends API[String](DepartmentService)
+) extends API[String](
+      DepartmentService,
+      "UpdateDepartmentSubjectRecommendationMessage"
+    )

@@ -8,4 +8,7 @@ import Objects.StudyStage
 case class QueryDepartmentSubjectRecommendationsMessage(
     departmentId: String,
     studyStage: StudyStage
-) extends API[List[DepartmentSubjectRecommendation]](DepartmentService)
+) extends API[List[DepartmentSubjectRecommendation]](
+      DepartmentService,
+      "QueryDepartmentSubjectRecommendationsMessage"
+    )

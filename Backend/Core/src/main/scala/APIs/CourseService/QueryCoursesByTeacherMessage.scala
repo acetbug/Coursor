@@ -6,4 +6,4 @@ import Objects.Course
 
 case class QueryCoursesByTeacherMessage(
     teacherId: String
-) extends API[List[Course]](CourseService)
+) extends API[List[Course]](CourseService, "QueryCoursesByTeacherMessage")

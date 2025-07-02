@@ -7,4 +7,4 @@ import Objects.Course
 case class UpdateCourseMessage(
     teacherToken: String,
     course: Course
-) extends API[String](CourseService)
+) extends API[String](CourseService, "UpdateCourseMessage")

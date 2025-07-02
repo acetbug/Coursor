@@ -5,4 +5,4 @@ import Global.ServiceCenter.AuthService
 
 case class DeleteAuthMessage(
     token: String
-) extends API[String](AuthService)
+) extends API[Unit](AuthService, "DeleteAuthMessage")

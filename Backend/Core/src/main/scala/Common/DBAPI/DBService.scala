@@ -2,5 +2,5 @@ package Common.DBAPI
 
 import Global.Service
 
-object DBService:
-  val service: Service = new Service(10002)
+case object DBService:
+  val service: Service = Service(10002)

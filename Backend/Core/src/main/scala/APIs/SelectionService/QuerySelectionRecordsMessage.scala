@@ -7,4 +7,7 @@ import Objects.SelectionRecord
 case class QuerySelectionRecordsMessage(
     studentId: String,
     termId: String
-) extends API[List[SelectionRecord]](SelectionService)
+) extends API[List[SelectionRecord]](
+      SelectionService,
+      "QuerySelectionRecordsMessage"
+    )

@@ -7,4 +7,4 @@ import Objects.Term
 case class UpdateTermMessage(
     adminToken: String,
     term: Term
-) extends API[String](TermService)
+) extends API[String](TermService, "UpdateTermMessage")

@@ -19,3 +19,4 @@ AA
 .metals
 .vscode
 .bloop
+*.scala.semanticdb

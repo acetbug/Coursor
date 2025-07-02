@@ -3,7 +3,7 @@ package APIs.SelectionService
 import Common.API.API
 import Global.ServiceCenter.SelectionService
 
-case class AddSelectionRecordMessage(
+case class DeleteSelectionRecordMessage(
     studentToken: String,
     selectionRecordId: String
-) extends API[String](SelectionService)
+) extends API[Unit](SelectionService, "DeleteSelectionRecordMessage")

@@ -6,4 +6,4 @@ import Global.ServiceCenter.SelectionService
 case class ExecuteLotteryMessage(
     adminToken: String,
     termId: String
-) extends API[String](SelectionService)
+) extends API[Unit](SelectionService, "ExecuteLotteryMessage")

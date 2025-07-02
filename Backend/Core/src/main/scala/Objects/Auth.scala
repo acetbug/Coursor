@@ -9,13 +9,13 @@ import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
   * @param userRole:
   *   UserRole (用户角色)
   * @param expiresAt:
-  *   Int (令牌过期时间)
+  *   Long (令牌过期时间)
   */
 
 case class Auth(
     token: String,
     userRole: UserRole,
-    expiresAt: Int
+    expiresAt: Long
 )
 
 case object Auth:

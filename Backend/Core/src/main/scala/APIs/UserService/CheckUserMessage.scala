@@ -7,4 +7,4 @@ import Objects.UserRole
 case class CheckUserMessage(
     userId: String,
     password: String
-) extends API[Option[UserRole]](UserService)
+) extends API[UserRole](UserService, "CheckUserMessage")

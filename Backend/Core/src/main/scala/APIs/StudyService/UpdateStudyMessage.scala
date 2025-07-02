@@ -7,4 +7,4 @@ import Objects.Study
 case class UpdateStudyMessage(
     adminToken: String,
     study: Study
-) extends API[String](StudyService)
+) extends API[String](StudyService, "UpdateStudyMessage")

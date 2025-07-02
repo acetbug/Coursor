@@ -7,4 +7,4 @@ import Objects.SelectionRecord
 case class UpdateSelectionRecordMessage(
     studentToken: String,
     selectionRecord: SelectionRecord
-) extends API[String](SelectionService)
+) extends API[String](SelectionService, "UpdateSelectionRecordMessage")

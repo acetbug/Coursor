@@ -6,4 +6,4 @@ import Objects.Department
 
 case class QueryDepartmentMessage(
     departmentId: String
-) extends API[Department](DepartmentService)
+) extends API[Department](DepartmentService, "QueryDepartmentMessage")

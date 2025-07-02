@@ -7,4 +7,4 @@ import Objects.Comment
 case class UpdateCommentMessage(
     studentToken: String,
     comment: Comment
-) extends API[String](CommentService)
+) extends API[String](CommentService, "UpdateCommentMessage")
