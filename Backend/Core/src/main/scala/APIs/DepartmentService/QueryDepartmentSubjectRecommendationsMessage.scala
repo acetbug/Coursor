@@ -1,7 +1,7 @@
 package APIs.DepartmentService
 
 import Common.API.API
-import Global.ServiceCenter.DepartmentService
+import Global.DepartmentService
 import Objects.DepartmentSubjectRecommendation
 import Objects.StudyStage
 

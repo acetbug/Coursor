@@ -1,10 +1,10 @@
 package APIs.StudyService
 
 import Common.API.API
-import Global.ServiceCenter.StudyService
+import Global.StudyService
 import Objects.StudyRecord
 
 case class UpdateStudyRecordMessage(
-    studentToken: String,
+    adminToken: String,
     studyRecord: StudyRecord
 ) extends API[String](StudyService, "UpdateStudyRecordMessage")

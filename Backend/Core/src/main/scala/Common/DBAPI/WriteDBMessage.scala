@@ -1,7 +1,6 @@
 package Common.DBAPI
 
 import Common.API.API
-import Common.Object.SqlParameter
 
 case class WriteDBMessage(sqlStatement: String, parameters: List[SqlParameter])
-    extends API[String](DBService.service, "WriteDBMessage")
+    extends API[String](DBService, "WriteDBMessage")

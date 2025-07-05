@@ -1,7 +1,7 @@
 package APIs.AuthService
 
 import Common.API.API
-import Global.ServiceCenter.AuthService
+import Global.AuthService
 
 case class DeleteAuthMessage(
     token: String

@@ -1,7 +1,7 @@
 package APIs.SelectionService
 
 import Common.API.API
-import Global.ServiceCenter.SelectionService
+import Global.SelectionService
 
 case class ExecuteLotteryMessage(
     adminToken: String,

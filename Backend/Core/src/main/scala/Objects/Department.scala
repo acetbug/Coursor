@@ -30,7 +30,7 @@ case object Department:
   *   String (学科的唯一ID)
   * @param studyStage:
   *   StudyStage (学段)
-  * @param level:
+  * @param priority:
   *   Int (推荐级别)
   */
 
@@ -39,7 +39,7 @@ case class DepartmentSubjectRecommendation(
     departmentId: String,
     subjectId: String,
     studyStage: StudyStage,
-    level: Int // TODO: 推荐级别的具体定义
+    priority: Int // TODO: 推荐级别的具体定义
 )
 
 case object DepartmentSubjectRecommendation:

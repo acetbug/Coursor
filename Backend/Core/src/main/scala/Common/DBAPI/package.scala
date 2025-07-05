@@ -1,8 +1,5 @@
 package Common
 
-import Object._
-import DBAPI._
-
 import cats.effect._
 import io.circe._
 import io.circe.generic.auto._

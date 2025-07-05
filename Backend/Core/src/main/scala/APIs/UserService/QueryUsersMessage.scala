@@ -1,7 +1,7 @@
 package APIs.UserService
 
 import Common.API.API
-import Global.ServiceCenter.UserService
+import Global.UserService
 import Objects._
 
 case class QueryUsersMessage(

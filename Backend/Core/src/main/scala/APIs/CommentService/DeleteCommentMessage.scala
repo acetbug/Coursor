@@ -1,7 +1,7 @@
 package APIs.CommentService
 
 import Common.API.API
-import Global.ServiceCenter.CommentService
+import Global.CommentService
 
 case class DeleteCommentMessage(
     adminToken: String,

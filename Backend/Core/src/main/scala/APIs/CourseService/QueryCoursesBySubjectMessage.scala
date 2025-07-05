@@ -1,7 +1,7 @@
 package APIs.CourseService
 
 import Common.API.API
-import Global.ServiceCenter.CourseService
+import Global.CourseService
 import Objects.Course
 
 case class QueryCoursesBySubjectMessage(

@@ -1,7 +1,7 @@
 package APIs.StudyService
 
 import Common.API.API
-import Global.ServiceCenter.StudyService
+import Global.StudyService
 import Objects.StudyRecord
 
 case class QueryStudyRecordsMessage(

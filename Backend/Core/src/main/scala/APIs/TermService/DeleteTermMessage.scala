@@ -1,7 +1,7 @@
 package APIs.TermService
 
 import Common.API.API
-import Global.ServiceCenter.TermService
+import Global.TermService
 
 case class DeleteTermMessage(
     adminToken: String,

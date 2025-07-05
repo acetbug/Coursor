@@ -1,10 +1,9 @@
 package APIs.StudyService
 
 import Common.API.API
-import Global.ServiceCenter.StudyService
-import Objects.StudyStage
+import Global.StudyService
 
 case class DeleteStudyRecordMessage(
-    studentToken: String,
+    adminToken: String,
     studyRecordId: String
 ) extends API[Unit](StudyService, "DeleteStudyRecordMessage")

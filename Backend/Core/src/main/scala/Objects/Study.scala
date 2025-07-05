@@ -3,7 +3,7 @@ package Objects
 import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 
-/** Study desc: 学生学期对应的学段
+/** StudyTrace desc: 学生某学期学习情况
   * @param id:
   *   String (学业的唯一标识符)
   * @param studentId:
@@ -14,16 +14,16 @@ import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
   *   String (学段)
   */
 
-case class Study(
+case class StudyTrace(
     id: String,
     studentId: String,
     termId: String,
     stage: StudyStage
 )
 
-case object Study:
-  given Encoder[Study] = deriveEncoder
-  given Decoder[Study] = deriveDecoder
+case object StudyTrace:
+  given Encoder[StudyTrace] = deriveEncoder
+  given Decoder[StudyTrace] = deriveDecoder
 
 enum StudyStage:
   case Freshman_0 // 大一小学期
@@ -53,33 +53,16 @@ case object StudyStage:
   *   String (学习记录的唯一标识符)
   * @param studentId:
   *   String (学生的唯一标识)
-  * @param courseId:
-  *   String (课程的唯一标识)
-  * @param status:
-  *   StudyStatus (学生的学习状态)
+  * @param subjectId:
+  *   String (科目的唯一标识)
   */
 
 case class StudyRecord(
     id: String,
     studentId: String,
-    courseId: String,
-    status: StudyStatus
+    subjectId: String
 )
 
 case object StudyRecord:
   given Encoder[StudyRecord] = deriveEncoder
   given Decoder[StudyRecord] = deriveDecoder
-
-enum StudyStatus:
-  case InProgress // 正在学习中
-  case Withdrew // 已中期退课
-  case Completed // 学习已完成
-
-object StudyStatus:
-  given encode: Encoder[StudyStatus] =
-    Encoder.encodeString.contramap[StudyStatus](_.toString)
-  given decode: Decoder[StudyStatus] = Decoder.decodeString.emap(fromString)
-
-  def fromString(s: String): Either[String, StudyStatus] = try
-    Right(StudyStatus.valueOf(s))
-  catch case _: IllegalArgumentException => Left(s"Unknown StudyStatus: $s")

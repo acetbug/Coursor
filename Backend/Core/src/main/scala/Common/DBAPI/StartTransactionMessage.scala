@@ -2,4 +2,4 @@ package Common.DBAPI
 
 import Common.API.API
 
-case class StartTransactionMessage() extends API[String](DBService.service, "StartTransactionMessage")
+case class StartTransactionMessage() extends API[String](DBService, "StartTransactionMessage")

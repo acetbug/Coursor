@@ -1,7 +1,7 @@
 package APIs.SubjectService
 
 import Common.API.API
-import Global.ServiceCenter.SubjectService
+import Global.SubjectService
 
 case class DeleteSubjectMessage(
     adminToken: String,

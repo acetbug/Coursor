@@ -14,8 +14,6 @@ import org.http4s.ember.client.EmberClientBuilder
 import scala.concurrent.duration.DurationInt
 
 abstract class API[T: Decoder](targetService: Service, name: String):
-  type ReturnType = T
-
   def getURIWithAPIMessageName: IO[Uri] =
     IO.fromEither(
       Uri.fromString(
@@ -27,19 +25,9 @@ abstract class API[T: Decoder](targetService: Service, name: String):
     API.send[T, this.type](this)
 
 object API:
-  trait ResponseHandler[T]:
-    def handle(response: Response[IO]): IO[T]
-
-  given ResponseHandler[String] with
-    def handle(response: Response[IO]): IO[String] =
-      response.bodyText.compile.string
-
-  given [T: Decoder]: ResponseHandler[T] with
-    def handle(response: Response[IO]): IO[T] =
-      response
-        .asJsonDecode[T]
-        .flatMap:
-          IO(_)
+  private def handle[T: Decoder](response: Response[IO]): IO[T] =
+    for result <- response.asJsonDecode[T]
+    yield result
 
   private var client: Option[Client[IO]] = None
 
@@ -72,20 +60,12 @@ object API:
       result <- client.get
         .run(request)
         .use: response =>
-          response.status match
-            case status if status.isSuccess =>
-              summon[ResponseHandler[T]].handle(response)
+          response match
+            case response if response.status.isSuccess =>
+              handle[T](response)
 
             case _ =>
-              summon[ResponseHandler[String]]
-                .handle(response)
-                .flatMap: rawJsonString =>
-                  val error = parse(rawJsonString) match
-                    case Left(_) => new Exception(rawJsonString)
-                    case Right(json) =>
-                      json.as[String] match
-                        case Left(_)        => new Exception(rawJsonString)
-                        case Right(message) => new Exception(message)
-
-                  IO.raiseError(error)
+              handle[String](response)
+                .flatMap: errorMessage =>
+                  IO.raiseError(new Exception(errorMessage))
     yield result

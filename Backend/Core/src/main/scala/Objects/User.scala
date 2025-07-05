@@ -10,7 +10,7 @@ import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
   *   String (用户密码，加密后)
   * @param name:
   *   String (用户姓名)
-  * @param userRole:
+  * @param role:
   *   UserRole (用户角色，可能是学生、老师或管理员)
   */
 
@@ -18,7 +18,7 @@ case class User(
     id: String,
     password: String,
     name: String,
-    userRole: UserRole
+    role: UserRole
 )
 
 case object User:

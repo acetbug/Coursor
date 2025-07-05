@@ -8,14 +8,14 @@ import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
   *   String (科目唯一标识符)
   * @param name:
   *   String (科目名称)
-  * @param credit:
+  * @param credits:
   *   Int (科目学分)
   */
 
 case class Subject(
     id: String,
     name: String,
-    credit: Int
+    credits: Int
 )
 
 case object Subject:

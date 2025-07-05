@@ -1,8 +1,9 @@
 package APIs.SubjectService
 
 import Common.API.API
-import Global.ServiceCenter.SubjectService
+import Global.SubjectService
 import Objects.Subject
 
-case class QuerySubjectsMessage()
-    extends API[List[Subject]](SubjectService, "QuerySubjectsMessage")
+case class QuerySubjectsMessage(
+    subjectIds: List[String]
+) extends API[List[Subject]](SubjectService, "QuerySubjectsMessage")

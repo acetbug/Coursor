@@ -1,7 +1,7 @@
 package APIs.DepartmentService
 
 import Common.API.API
-import Global.ServiceCenter.DepartmentService
+import Global.DepartmentService
 
 case class DeleteDepartmentMessage(
     adminToken: String,

@@ -23,10 +23,7 @@ case object Term:
   given Decoder[Term] = deriveDecoder
 
 enum TermPhase:
-  case NotStarted // 尚未开始
-  case PreSelection // 预选阶段
-  case MainSelection // 主选阶段
-  case MidTermWithdrawal // 期中退课阶段
+  case InSelection // 选课阶段
   case Confirmed // 确认阶段
 
 case object TermPhase:
