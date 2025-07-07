@@ -7,163 +7,258 @@ import cats.effect.IO
 import io.circe.Json
 import io.circe.generic.auto._
 import io.circe.syntax._
+import java.util.UUID
+import java.time.Instant
 
 object Utils:
   val thisService = UserService
-
-  def init: IO[Unit] =
-    for
-      _ <- initSchema(thisService.schema)
-      _ <- writeDB(
-        s"""
-         |CREATE TABLE IF NOT EXISTS ${thisService.schema}.${thisService.userTable} (
-         |    id VARCHAR PRIMARY KEY,
-         |    password VARCHAR NOT NULL,
-         |    name TEXT NOT NULL,
-         |    role VARCHAR(10) NOT NULL
-         |);
-        """.stripMargin,
-        List()
-      )
-    yield ()
+  val initSql =
+    s"""
+      |CREATE TABLE IF NOT EXISTS ${thisService.schema}.${thisService.authTable} (
+      |    token VARCHAR PRIMARY KEY,
+      |    user_id VARCHAR NOT NULL
+      |        REFERENCES ${thisService.schema}.${thisService.userTable}(id)
+      |        ON DELETE CASCADE,
+      |    expires_at BIGINT NOT NULL
+      |);
+      |CREATE TABLE IF NOT EXISTS ${thisService.schema}.${thisService.userTable} (
+      |    id VARCHAR PRIMARY KEY,
+      |    password VARCHAR NOT NULL,
+      |    name TEXT NOT NULL,
+      |    role VARCHAR(10) NOT NULL
+      |);
+    """.stripMargin
 
   def handleRequest(
       messageName: String,
       requestJson: Json
   ): IO[Json] = messageName match
-    case "CheckUserMessage" =>
-      Planner.execute[CheckUserMessagePlanner, UserRole](requestJson)
-    case "DeleteUserMessage" =>
-      Planner.execute[DeleteUserMessagePlanner, Unit](requestJson)
+    case "LoginMessage" =>
+      Planner.execute[LoginMessagePlanner, UserAuth](requestJson)
+    case "LogoutMessage" =>
+      Planner.execute[LogoutMessagePlanner, Unit](requestJson)
+    case "CheckAuthMessage" =>
+      Planner.execute[CheckAuthMessagePlanner, String](requestJson)
+    case "CheckUserRoleMessage" =>
+      Planner.execute[CheckUserRoleMessagePlanner, Unit](requestJson)
+    case "CreateUserMessage" =>
+      Planner.execute[CreateUserMessagePlanner, Unit](requestJson)
     case "QueryUsersMessage" =>
       Planner.execute[QueryUsersMessagePlanner, List[User]](requestJson)
-    case "UpdateUserMessage" =>
-      Planner.execute[UpdateUserMessagePlanner, Unit](requestJson)
+    case "UpdateUserPasswordMessage" =>
+      Planner.execute[UpdateUserPasswordMessagePlanner, Unit](requestJson)
+    case "UpdateUserNameMessage" =>
+      Planner.execute[UpdateUserNameMessagePlanner, Unit](requestJson)
+    case "DeleteUserMessage" =>
+      Planner.execute[DeleteUserMessagePlanner, Unit](requestJson)
     case _ =>
       IO.raiseError(
         new Exception(s"Unknown message type: $messageName")
       )
 
-  def checkUser(
+  def login(
       userId: String,
       password: String
-  ): IO[UserRole] =
-    val sql =
-      s"""
-       |SELECT role
-       |FROM ${thisService.schema}.${thisService.userTable}
-       |WHERE id = ? AND password = ?;
-      """.stripMargin
-
-    val params =
-      List(
-        SqlParameter("String", userId),
-        SqlParameter("String", password)
-      )
-
+  ): IO[UserAuth] =
     for
-      jsonOptional <- readDBJsonOptional(sql, params)
-
-      userRole <- jsonOptional match
-        case Some(json) =>
-          IO(decodeField[UserRole](json, "role"))
-        case None =>
-          IO.raiseError(new Exception("User not found or invalid credentials"))
-    yield userRole
-
-  def deleteUser(
-      userId: String
-  ): IO[Unit] =
-    val sql =
-      s"""
-       |DELETE FROM ${thisService.schema}.${thisService.userTable}
-       |WHERE id = ?;
-      """.stripMargin
-
-    val params =
-      List(
-        SqlParameter("String", userId)
+      jsonOpt <- readDBJsonOptional(
+        s"""
+          |SELECT name, role
+          |FROM ${thisService.schema}.${thisService.userTable}
+          |WHERE id = ? AND password = ?;
+        """.stripMargin,
+        List(
+          SqlParameter("String", userId),
+          SqlParameter("String", password)
+        )
       )
 
-    for _ <- writeDB(sql, params) yield ()
+      userAuth <- jsonOpt match
+        case Some(json) =>
+          IO:
+            UserAuth(
+              token = UUID.randomUUID.toString,
+              name = decodeField[String](json, "name"),
+              role = decodeField[Role](json, "role")
+            )
+        case None =>
+          IO.raiseError(
+            new Exception("User not found or wrong password")
+          )
+
+      _ <- writeDB(
+        s"""
+          |INSERT INTO ${thisService.schema}.${thisService.authTable} (token, user_id, expires_at)
+          |VALUES (?, ?, ?);
+        """.stripMargin,
+        List(
+          SqlParameter("String", userAuth.token),
+          SqlParameter("String", userId),
+          SqlParameter("Long", (Instant.now.getEpochSecond + 1800).toString)
+        )
+      )
+    yield userAuth
+
+  def logout(
+      token: String
+  ): IO[Unit] =
+    for _ <- writeDB(
+        s"""
+          |DELETE FROM ${thisService.schema}.${thisService.authTable}
+          |WHERE token = ?;
+        """.stripMargin,
+        List(SqlParameter("String", token))
+      )
+    yield ()
+
+  def checkAuth(
+      token: String,
+      role: Role
+  ): IO[String] =
+    for
+      userId <- readDBString(
+        s"""
+          |SELECT user_id
+          |FROM ${thisService.schema}.${thisService.authTable}
+          |WHERE token = ? AND expires_at > ?;
+        """.stripMargin,
+        List(
+          SqlParameter("String", token),
+          SqlParameter("Long", Instant.now.getEpochSecond.toString)
+        )
+      )
+
+      _ <- checkUserRole(userId, role)
+    yield userId
+
+  def checkUserRole(
+      userId: String,
+      role: Role
+  ): IO[Unit] =
+    for
+      exists <- readDBBoolean(
+        s"""
+          |SELECT EXISTS (
+          |    SELECT 1
+          |    FROM ${thisService.schema}.${thisService.userTable}
+          |    WHERE id = ? AND role = ?;
+          |);
+        """.stripMargin,
+        List(
+          SqlParameter("String", userId),
+          SqlParameter("String", role.toString)
+        )
+      )
+
+      _ <-
+        if exists then IO.unit
+        else
+          IO.raiseError(
+            new Exception(s"User with id $userId does not have role $role")
+          )
+    yield ()
+
+  def createUser(
+      userId: String,
+      password: String,
+      name: String,
+      role: Role
+  ): IO[Unit] =
+    for
+      exists <- readDBBoolean(
+        s"""
+          |SELECT EXISTS (
+          |    SELECT 1
+          |    FROM ${thisService.schema}.${thisService.userTable}
+          |    WHERE id = ?;
+          |);
+        """.stripMargin,
+        List(SqlParameter("String", userId))
+      )
+
+      _ <-
+        if exists then
+          IO.raiseError(new Exception(s"User with id $userId already exists"))
+        else
+          writeDB(
+            s"""
+              |INSERT INTO ${thisService.schema}.${thisService.userTable} (id, password, name, role)
+              |VALUES (?, ?, ?, ?);
+            """.stripMargin,
+            List(
+              SqlParameter("String", userId),
+              SqlParameter("String", password),
+              SqlParameter("String", name),
+              SqlParameter("String", role.toString)
+            )
+          )
+    yield ()
 
   def queryUsers(
-      userRole: UserRole
+      role: Role
   ): IO[List[User]] =
-    val sql =
-      s"""
-       |SELECT *
-       |FROM ${thisService.schema}.${thisService.userTable}
-       |WHERE role = ?;
-      """.stripMargin
-
-    val params =
-      List(
-        SqlParameter("String", userRole.toString)
-      )
-
     for
-      rows <- readDBRows(sql, params)
+      rows <- readDBRows(
+        s"""
+          |SELECT id, name
+          |FROM ${thisService.schema}.${thisService.userTable}
+          |WHERE role = ?;
+        """.stripMargin,
+        List(
+          SqlParameter("String", role.toString)
+        )
+      )
 
       users =
         rows.map: row =>
           User(
             id = decodeField[String](row, "id"),
-            password = decodeField[String](row, "password"),
-            name = decodeField[String](row, "name"),
-            role = decodeField[UserRole](row, "role")
+            name = decodeField[String](row, "name")
           )
     yield users
 
-  def updateUser(
-      user: User
+  def updateUserPassword(
+      userId: String,
+      password: String
   ): IO[Unit] =
-    val sql =
-      s"""
-       |SELECT id
-       |FROM ${thisService.schema}.${thisService.userTable}
-       |WHERE id = ?;
-      """.stripMargin
-
-    val params =
-      List(
-        SqlParameter("String", user.id)
+    for _ <- writeDB(
+        s"""
+          |UPDATE ${thisService.schema}.${thisService.userTable}
+          |SET password = ?
+          |WHERE id = ?;
+        """.stripMargin,
+        List(
+          SqlParameter("String", password),
+          SqlParameter("String", userId)
+        )
       )
+    yield ()
 
-    for
-      jsonOptional <- readDBJsonOptional(sql, params)
+  def updateUserName(
+      userId: String,
+      name: String
+  ): IO[Unit] =
+    for _ <- writeDB(
+        s"""
+          |UPDATE ${thisService.schema}.${thisService.userTable}
+          |SET name = ?
+          |WHERE id = ?;
+        """.stripMargin,
+        List(
+          SqlParameter("String", name),
+          SqlParameter("String", userId)
+        )
+      )
+    yield ()
 
-      _ <- jsonOptional match
-        case Some(_) =>
-          val updateSql =
-            s"""
-             |UPDATE ${thisService.schema}.${thisService.userTable}
-             |SET password = ?, name = ?, role = ?
-             |WHERE id = ?;
-            """.stripMargin
-
-          val updateParams = List(
-            SqlParameter("String", user.password),
-            SqlParameter("String", user.name),
-            SqlParameter("String", user.role.toString),
-            SqlParameter("String", user.id)
-          )
-
-          writeDB(updateSql, updateParams)
-
-        case None =>
-          val insertSql =
-            s"""
-             |INSERT INTO ${thisService.schema}.${thisService.userTable} (id, password, name, role)
-             |VALUES (?, ?, ?, ?);
-            """.stripMargin
-
-          val insertParams = List(
-            SqlParameter("String", user.id),
-            SqlParameter("String", user.password),
-            SqlParameter("String", user.name),
-            SqlParameter("String", user.role.toString)
-          )
-
-          writeDB(insertSql, insertParams)
+  def deleteUser(
+      userId: String
+  ): IO[Unit] =
+    for _ <- writeDB(
+        s"""
+          |DELETE FROM ${thisService.schema}.${thisService.userTable}
+          |WHERE id = ?;
+        """.stripMargin,
+        List(SqlParameter("String", userId))
+      )
     yield ()

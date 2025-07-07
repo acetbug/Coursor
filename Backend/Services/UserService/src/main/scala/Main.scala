@@ -9,7 +9,6 @@ object Main extends IOApp:
     val server = Server.server(Utils.thisService.port, app)
 
     for
-      _ <- Server.init
-      _ <- Utils.init
+      _ <- Server.init(Utils.thisService.schema, Utils.initSql)
       exitCode <- server.useForever.as(ExitCode.Success)
     yield exitCode

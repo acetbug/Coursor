@@ -17,9 +17,11 @@ import org.http4s.server.middleware.CORS
 import scala.concurrent.duration.DurationInt
 
 object Server:
-  def init: IO[Unit] =
+  def init(schema: String, initSql: String): IO[Unit] =
     for
       _ <- API.init
+      _ <- initSchema(schema)
+      _ <- writeDB(initSql, List())
       _ <- SwitchDataSourceMessage("coursor").send
       _ <- StartTransactionMessage().send
     yield ()
