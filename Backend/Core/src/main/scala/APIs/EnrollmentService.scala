@@ -6,52 +6,47 @@ import Objects._
 
 import io.circe.generic.auto._
 
-case class CreateEnrollmentMessage(
+case class CreateSelectionMessage(
     studentToken: String,
     termId: String,
     subjectId: String,
-    courseId: String,
-    points: Int
-) extends API[Unit](EnrollmentService, "CreateEnrollmentMessage")
+    courseId: String
+) extends API[Unit](EnrollmentService, "CreateSelectionMessage")
 
-case class QueryStakePointsMessage(
-    studentId: String,
-    termId: String,
-    departmentId: String,
-    stage: Stage
-) extends API[Int](EnrollmentService, "QueryStakePointsMessage")
-
-case class QueryEnrollmentsMessage(
+case class QueryAllocatedStakePointsMessage(
     studentId: String,
     termId: String
-) extends API[List[EnrollmentGroup]](
+) extends API[Int](EnrollmentService, "QueryAllocatedStakePointsMessage")
+
+case class QuerySelectionsMessage(
+    studentId: String,
+    termId: String
+) extends API[List[Selection]](
       EnrollmentService,
-      "QueryEnrollmentsMessage"
+      "QuerySelectionsMessage"
     )
-
-case class QueryRecordsMessage(
-    studentId: String,
-    termId: String
-) extends API[List[Enrollment]](EnrollmentService, "QueryRecordsMessage")
 
 case class UpdateStakeMessage(
     studentToken: String,
-    stakeId: String,
+    termId: String,
+    selectionId: String,
     points: Int
 ) extends API[Unit](EnrollmentService, "UpdateStakeMessage")
 
-case class UpdateEnrollmentMessage(
+case class UpdateSelectedCourseMessage(
     studentToken: String,
-    stakeId: String,
+    termId: String,
+    selectionId: String,
     courseId: String
-) extends API[Unit](EnrollmentService, "UpdateEnrollmentMessage")
+) extends API[Unit](EnrollmentService, "UpdateSelectedCourseMessage")
 
-case class DeleteStakeMessage(
+case class DeleteSelectionMessage(
     studentToken: String,
-    stakeId: String
-) extends API[Unit](EnrollmentService, "DeleteStakeMessage")
+    termId: String,
+    selectionId: String
+) extends API[Unit](EnrollmentService, "DeleteSelectionMessage")
 
-case class DeleteEnrollmentMessage(
-    studentToken: String,
-    courseId: String
-) extends API[Unit](EnrollmentService, "DeleteEnrollmentMessage")
+case class ExecuteEnrollmentMessage(
+    adminToken: String,
+    termId: String,
+) extends API[Unit](EnrollmentService, "ExecuteEnrollmentMessage")

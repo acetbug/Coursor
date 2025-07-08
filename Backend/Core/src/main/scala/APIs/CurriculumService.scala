@@ -44,6 +44,12 @@ case class QueryCurriculaMessage(departmentId: String)
       "QueryCurriculaMessage"
     )
 
+case class QueryRecommendationsMessage(departmentId: String, stage: Stage)
+    extends API[List[Recommendation]](
+      CurriculumService,
+      "QueryRecommendationsMessage"
+    )
+
 case class QueryTeachingsMessage(teacherId: String, termId: String)
     extends API[List[Teaching]](
       CurriculumService,

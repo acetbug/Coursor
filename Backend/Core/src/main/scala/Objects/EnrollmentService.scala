@@ -13,12 +13,9 @@ case class Enrollment(
 )
 
 case class Selection(
-    stake: Stake,
-    course: Option[Course]
-)
-
-case class Stake(
     id: String,
+    subjectId: String,
+    courseId: String,
     points: Int
 )
 

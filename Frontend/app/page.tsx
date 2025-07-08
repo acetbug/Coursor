@@ -32,10 +32,10 @@ export default function Home() {
             color="text.primary"
             gutterBottom
           >
-            欢迎来到 Coursor
+            Coursor
           </Typography>
           <Typography variant="h5" align="center" color="text.secondary">
-            选择数百门课程，构建您完美的学习路径
+            不只是选课系统
           </Typography>
 
           <Grid container spacing={4} sx={{ mt: 4 }}>

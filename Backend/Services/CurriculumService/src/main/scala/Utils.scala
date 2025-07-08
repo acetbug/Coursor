@@ -28,7 +28,6 @@ object Utils:
       |    stage VARCHAR(12) NOT NULL,
       |    priority INT NOT NULL,
       |    UNIQUE (department_id, subject_id)
-      |        ON CONFLICT DO NOTHING
       |);
       |CREATE TABLE IF NOT EXISTS ${thisService.schema}.${thisService.courseTable} (
       |    id SERIAL PRIMARY KEY,
@@ -125,7 +124,8 @@ object Utils:
     for _ <- writeDB(
         s"""
           |INSERT INTO ${thisService.schema}.${thisService.recommendationTable} (department_id, subject_id, stage, priority)
-          |VALUES (?, ?, ?, ?);
+          |VALUES (?, ?, ?, ?)
+          |ON CONFLICT DO NOTHING;
         """.stripMargin,
         List(
           SqlParameter("Int", departmentId),

@@ -14,18 +14,18 @@ object Utils:
   val thisService = UserService
   val initSql =
     s"""
+      |CREATE TABLE IF NOT EXISTS ${thisService.schema}.${thisService.userTable} (
+      |    id VARCHAR PRIMARY KEY,
+      |    password VARCHAR NOT NULL,
+      |    name TEXT NOT NULL,
+      |    role VARCHAR(10) NOT NULL
+      |);
       |CREATE TABLE IF NOT EXISTS ${thisService.schema}.${thisService.authTable} (
       |    token VARCHAR PRIMARY KEY,
       |    user_id VARCHAR NOT NULL
       |        REFERENCES ${thisService.schema}.${thisService.userTable}(id)
       |        ON DELETE CASCADE,
       |    expires_at BIGINT NOT NULL
-      |);
-      |CREATE TABLE IF NOT EXISTS ${thisService.schema}.${thisService.userTable} (
-      |    id VARCHAR PRIMARY KEY,
-      |    password VARCHAR NOT NULL,
-      |    name TEXT NOT NULL,
-      |    role VARCHAR(10) NOT NULL
       |);
     """.stripMargin
 
@@ -141,7 +141,7 @@ object Utils:
           |SELECT EXISTS (
           |    SELECT 1
           |    FROM ${thisService.schema}.${thisService.userTable}
-          |    WHERE id = ? AND role = ?;
+          |    WHERE id = ? AND role = ?
           |);
         """.stripMargin,
         List(
@@ -170,7 +170,7 @@ object Utils:
           |SELECT EXISTS (
           |    SELECT 1
           |    FROM ${thisService.schema}.${thisService.userTable}
-          |    WHERE id = ?;
+          |    WHERE id = ?
           |);
         """.stripMargin,
         List(SqlParameter("String", userId))

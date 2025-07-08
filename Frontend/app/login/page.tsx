@@ -7,12 +7,11 @@ import {
   Typography,
   TextField,
   Button,
-  Alert,
-  Snackbar,
 } from "@mui/material";
 import CryptoJS from "crypto-js";
 import { useState } from "react";
-import AuthService from "../../lib/services/authService";
+import UserService from "@/lib/services/userService";
+import { useNotification } from "@/components/notificationProvider";
 
 interface LoginForm {
   userId: string;
@@ -20,39 +19,47 @@ interface LoginForm {
 }
 
 export default function LoginPage() {
+  const { notify } = useNotification();
+
   const [form, setForm] = useState<LoginForm>({
     userId: "",
     password: "",
   });
 
-  const [error, setError] = useState("");
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [error, setError] = useState<LoginForm>({
+    userId: "",
+    password: "",
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
+    setError({
+      ...error,
+      [e.target.name]: e.target.value === "" ? "Required" : "",
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    if (error.userId || error.password || !form.userId || !form.password) {
+      notify("Please fill in all required fields correctly.");
+      return;
+    }
     try {
-      await AuthService.createAuth({
+      await UserService.login({
         userId: form.userId,
         password: CryptoJS.SHA256(form.password).toString(),
       });
     } catch (error) {
       let errorMessage = "An error occurred during login";
-
       if (error instanceof Error) errorMessage = error.message;
-
-      setError(errorMessage);
-      setOpenSnackbar(true);
+      notify(errorMessage);
+      return;
     }
   };
-
-  const handleCloseSnackbar = () => setOpenSnackbar(false);
 
   return (
     <Box
@@ -90,10 +97,12 @@ export default function LoginPage() {
               id="userid"
               label="User ID"
               name="userId"
-              autoComplete="userId"
+              autoComplete="username"
               autoFocus
               value={form.userId}
               onChange={handleChange}
+              error={!!error.userId}
+              helperText={error.userId}
               sx={{ mb: 2 }}
             />
             <TextField
@@ -107,6 +116,8 @@ export default function LoginPage() {
               autoComplete="current-password"
               value={form.password}
               onChange={handleChange}
+              error={!!error.password}
+              helperText={error.password}
               sx={{ mb: 2 }}
             />
             <Button
@@ -120,21 +131,6 @@ export default function LoginPage() {
           </Box>
         </Paper>
       </Container>
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
-          {error}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }

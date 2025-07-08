@@ -31,7 +31,6 @@ object Utils:
       |        ON DELETE CASCADE,
       |    stage VARCHAR(12) NOT NULL,
       |    UNIQUE (student_id, term_id)
-      |        ON CONFLICT DO NOTHING
       |);
       |CREATE TABLE IF NOT EXISTS ${thisService.schema}.${thisService.registerTable} (
       |    id SERIAL PRIMARY KEY,
@@ -39,10 +38,9 @@ object Utils:
       |        REFERENCES ${UserService.schema}.${UserService.userTable}(id)
       |        ON DELETE CASCADE,
       |    department_id INT NOT NULL
-      |        REFERENCES ${DepartmentService.schema}.${DepartmentService.departmentTable}(id)
+      |        REFERENCES ${thisService.schema}.${thisService.departmentTable}(id)
       |        ON DELETE CASCADE,
       |    UNIQUE (student_id)
-      |        ON CONFLICT DO NOTHING
       |);
     """.stripMargin
 
@@ -107,7 +105,8 @@ object Utils:
     for _ <- writeDB(
         s"""
           |INSERT INTO ${thisService.schema}.${thisService.registerTable} (student_id, department_id)
-          |VALUES (?, ?);
+          |VALUES (?, ?)
+          |ON CONFLICT DO NOTHING;
         """.stripMargin,
         List(
           SqlParameter("String", studentId),
@@ -139,7 +138,8 @@ object Utils:
     for _ <- writeDB(
         s"""
           |INSERT INTO ${thisService.schema}.${thisService.traceTable} (student_id, term_id, stage)
-          |VALUES (?, ?, ?);
+          |VALUES (?, ?, ?)
+          |ON CONFLICT DO NOTHING;
         """.stripMargin,
         List(
           SqlParameter("String", studentId),
