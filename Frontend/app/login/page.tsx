@@ -9,9 +9,12 @@ import {
   Button,
 } from "@mui/material";
 import CryptoJS from "crypto-js";
-import { useState } from "react";
-import UserService from "@/lib/services/userService";
-import { useNotification } from "@/components/notificationProvider";
+import { useCallback, useEffect, useState } from "react";
+import { useNotification } from "@/context/notificationContext";
+import { useAuth } from "@/context/authContext";
+import { useAppBar } from "@/context/appBarContext";
+import defaultTheme from "@/themes/defaultTheme";
+import UserService from "@/services/userService";
 
 interface LoginForm {
   userId: string;
@@ -20,6 +23,8 @@ interface LoginForm {
 
 export default function LoginPage() {
   const { notify } = useNotification();
+  const { userInfo, login, jumpDefault } = useAuth();
+  const { setAppBar } = useAppBar();
 
   const [form, setForm] = useState<LoginForm>({
     userId: "",
@@ -31,16 +36,16 @@ export default function LoginPage() {
     password: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({
-      ...form,
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm((prevForm) => ({
+      ...prevForm,
       [e.target.name]: e.target.value,
-    });
-    setError({
-      ...error,
+    }));
+    setError((prevError) => ({
+      ...prevError,
       [e.target.name]: e.target.value === "" ? "Required" : "",
-    });
-  };
+    }));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,32 +53,36 @@ export default function LoginPage() {
       notify("Please fill in all required fields correctly.");
       return;
     }
-    try {
-      await UserService.login({
-        userId: form.userId,
-        password: CryptoJS.SHA256(form.password).toString(),
-      });
-    } catch (error) {
-      let errorMessage = "An error occurred during login";
-      if (error instanceof Error) errorMessage = error.message;
-      notify(errorMessage);
-      return;
+    const result = await UserService.login({
+      userId: form.userId,
+      password: CryptoJS.SHA256(form.password).toString(),
+    });
+    if (result instanceof Error) notify(result.message);
+    else {
+      notify("Login successfully", "success");
+      login({ id: form.userId, ...result });
     }
   };
 
+  useEffect(() => {
+    if (userInfo) jumpDefault(userInfo);
+    setAppBar({
+      theme: defaultTheme,
+      tabs: [],
+    });
+  }, [jumpDefault, setAppBar, userInfo]);
+
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        bgcolor: "background.default",
-      }}
-    >
+    <Box sx={{ display: "flex", alignItems: "center", flex: 1 }}>
       <Container maxWidth="sm">
         <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-          <Typography variant="h4" align="center" gutterBottom>
-            Login
+          <Typography
+            variant="h4"
+            color="primary.dark"
+            align="center"
+            gutterBottom
+          >
+            登录
           </Typography>
           <Typography
             variant="body1"
@@ -81,7 +90,7 @@ export default function LoginPage() {
             color="text.secondary"
             sx={{ mb: 3 }}
           >
-            Sign in to access your course selection
+            登录以访问 Coursor
           </Typography>
 
           <Box
@@ -95,7 +104,7 @@ export default function LoginPage() {
               required
               fullWidth
               id="userid"
-              label="User ID"
+              label="用户名"
               name="userId"
               autoComplete="username"
               autoFocus
@@ -110,7 +119,7 @@ export default function LoginPage() {
               required
               fullWidth
               name="password"
-              label="Password"
+              label="密码"
               type="password"
               id="password"
               autoComplete="current-password"
@@ -126,7 +135,7 @@ export default function LoginPage() {
               variant="contained"
               sx={{ mt: 2, py: 1.5 }}
             >
-              Sign In
+              登录
             </Button>
           </Box>
         </Paper>

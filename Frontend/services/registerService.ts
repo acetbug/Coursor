@@ -1,4 +1,4 @@
-import { Department, Stage } from "../types/registerService";
+import { Department, Stage } from "@/types/registerService";
 import ApiClient from "./apiClient";
 
 const port = 10011;

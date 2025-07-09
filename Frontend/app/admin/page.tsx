@@ -1,11 +1,6 @@
-"use client";
+import { Container, Stack, Typography } from "@mui/material";
 
-import { useAuth } from "@/context/authContext";
-import { Button, Container, Stack, Typography } from "@mui/material";
-
-export default function HomePage() {
-  const { jumpDefault } = useAuth();
-
+export default function AdminPage() {
   return (
     <Container sx={{ display: "flex", flex: 1 }}>
       <Stack
@@ -24,21 +19,12 @@ export default function HomePage() {
           m={2}
           gutterBottom
         >
-          欢迎来到 Coursor
+          欢迎来到 Coursor 管理系统
         </Typography>
 
         <Typography variant="h5" color="text.secondary">
-          不只是选课系统
+          请从顶栏选择您需要的功能
         </Typography>
-
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          onClick={() => jumpDefault()}
-        >
-          从这里开始
-        </Button>
       </Stack>
     </Container>
   );

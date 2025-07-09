@@ -16,27 +16,15 @@ interface NotificationMessage {
   severity: NotificationSeverity;
 }
 
-type NotificationContextType = {
+interface NotificationContextType {
   notify: (message: string, severity?: NotificationSeverity) => void;
-};
+}
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
   undefined
 );
 
-export const useNotification = () => {
-  const context = useContext(NotificationContext);
-  if (!context) {
-    throw new Error(
-      "useNotification must be used within a NotificationProvider"
-    );
-  }
-  return context;
-};
-
-export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export function NotificationProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState<NotificationMessage | null>(null);
 
@@ -74,4 +62,14 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({
       </Snackbar>
     </NotificationContext.Provider>
   );
-};
+}
+
+export function useNotification() {
+  const context = useContext(NotificationContext);
+  if (!context) {
+    throw new Error(
+      "useNotification must be used within a NotificationProvider"
+    );
+  }
+  return context;
+}

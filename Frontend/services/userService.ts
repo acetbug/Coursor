@@ -1,4 +1,4 @@
-import { Role, User, UserAuth } from "../types/userService";
+import { Role, User, UserAuth } from "@/types/userService";
 import ApiClient from "./apiClient";
 
 const port = 10010;
@@ -11,7 +11,7 @@ const UserService = {
 
   logout: client.api<{ token: string }, void>("LogoutMessage"),
 
-  checkAuth: client.api<{ token: string; role: Role }, unknown>(
+  checkAuth: client.api<{ token: string; role: Role }, string>(
     "CheckAuthMessage"
   ),
 
