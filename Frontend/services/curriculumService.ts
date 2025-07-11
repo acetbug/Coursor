@@ -1,6 +1,7 @@
 import { Stage } from "@/types/registerService";
 import ApiClient from "./apiClient";
 import {
+  Comment,
   Course,
   Curriculum,
   Recommendation,
