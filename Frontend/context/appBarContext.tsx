@@ -43,7 +43,7 @@ export function AppBarProvider({ children }: { children: ReactNode }) {
       <AppBarContext.Provider value={{ setAppBar }}>
         <AppBar position="sticky" color="primary">
           <Toolbar>
-            <Typography variant="h6" onClick={() => router.push("/")}>
+            <Typography mr={2} variant="h6" onClick={() => router.push("/")} sx={{ cursor: "pointer" }}>
               Coursor
             </Typography>
             {appBar.tabs.map((tab) => (
@@ -52,7 +52,6 @@ export function AppBarProvider({ children }: { children: ReactNode }) {
                 color="inherit"
                 key={tab.label}
                 onClick={() => router.push(tab.href)}
-                sx={{ ml: 2, mr: 2 }}
               >
                 <Typography variant="body1">{tab.label}</Typography>
               </Button>

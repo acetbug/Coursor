@@ -13,10 +13,9 @@ export default function StudentLayout({ children }: { children: ReactNode }) {
   const { notify } = useNotification();
 
   useEffect(() => {
-    checkAuthStatus().then((result) => {
-      if (result !== Role.Student) {
-        if (result instanceof Error) notify(result.message);
-        else notify("Unauthorized access");
+    checkAuthStatus(Role.Student).then((result) => {
+      if (result instanceof Error) {
+        notify(result.message);
         jumpDefault();
       }
     });

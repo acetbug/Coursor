@@ -13,16 +13,22 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const { notify } = useNotification();
 
   useEffect(() => {
-    checkAuthStatus().then((result) => {
-      if (result !== Role.Admin) {
-        if (result instanceof Error) notify(result.message);
-        else notify("Unauthorized access");
+    checkAuthStatus(Role.Admin).then((result) => {
+      if (result instanceof Error) {
+        notify(result.message);
         jumpDefault();
       }
     });
     setAppBar({
       theme: adminTheme,
-      tabs: [{ label: "用户", href: "/admin/users" }],
+      tabs: [
+        { label: "用户", href: "/admin/users" },
+        { label: "院系", href: "/admin/departments" },
+        { label: "学期", href: "/admin/terms" },
+        { label: "学籍", href: "/admin/students" },
+        { label: "科目", href: "/admin/subjects" },
+        { label: "培养", href: "/admin/curricula" },
+      ],
     });
   }, [checkAuthStatus, jumpDefault, notify, setAppBar]);
 

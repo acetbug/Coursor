@@ -13,16 +13,15 @@ export default function TeacherLayout({ children }: { children: ReactNode }) {
   const { notify } = useNotification();
 
   useEffect(() => {
-    checkAuthStatus().then((result) => {
-      if (result !== Role.Teacher) {
-        if (result instanceof Error) notify(result.message);
-        else notify("Unauthorized access");
+    checkAuthStatus(Role.Teacher).then((result) => {
+      if (result instanceof Error) {
+        notify(result.message);
         jumpDefault();
       }
     });
     setAppBar({
       theme: teacherTheme,
-      tabs: [{ label: "课程管理", href: "/teacher/courses" }],
+      tabs: [{ label: "开课", href: "/teacher/teaching" }],
     });
   }, [checkAuthStatus, jumpDefault, notify, setAppBar]);
 

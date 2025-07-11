@@ -50,7 +50,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (error.userId || error.password || !form.userId || !form.password) {
-      notify("Please fill in all required fields correctly.");
+      notify("Please fill in all required fields correctly");
       return;
     }
     const result = await UserService.login({

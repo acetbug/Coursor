@@ -1,10 +1,21 @@
 "use client";
 
+import { useAppBar } from "@/context/appBarContext";
 import { useAuth } from "@/context/authContext";
+import defaultTheme from "@/themes/defaultTheme";
 import { Button, Container, Stack, Typography } from "@mui/material";
+import { useEffect } from "react";
 
 export default function HomePage() {
   const { jumpDefault } = useAuth();
+  const { setAppBar } = useAppBar();
+
+  useEffect(() => {
+    setAppBar({
+      theme: defaultTheme,
+      tabs: [],
+    });
+  }, [setAppBar]);
 
   return (
     <Container sx={{ display: "flex", flex: 1 }}>

@@ -22,17 +22,19 @@ interface UserInfo {
 }
 
 interface AuthContextType {
-  userInfo: UserInfo | null;
+  userInfo: UserInfo | undefined | null;
   login: (userInfo: UserInfo) => void;
   logout: () => void;
-  checkAuthStatus: () => Promise<Result<Role>>;
+  checkAuthStatus: (role: Role) => Promise<Result<void>>;
   jumpDefault: (givenUserInfo?: UserInfo) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo | undefined | null>(
+    undefined
+  );
   const router = useRouter();
 
   const login = useCallback((userInfo: UserInfo) => {
@@ -46,22 +48,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("user");
   }, [userInfo]);
 
-  const checkAuthStatus = useCallback(async () => {
-    if (!userInfo) return new Error("User not logged in");
-    const result = await UserService.checkAuth({
-      token: userInfo.token,
-      role: userInfo.role,
-    });
-    if (result instanceof Error) {
-      logout();
-      return result;
-    }
-    if (userInfo.id !== result) {
-      logout();
-      return new Error("User ID mismatch");
-    }
-    return userInfo.role;
-  }, [logout, userInfo]);
+  const checkAuthStatus = useCallback(
+    async (role: Role) => {
+      if (userInfo === undefined) return;
+      if (userInfo === null) return new Error("User not logged in");
+      if (userInfo.role !== role) {
+        logout();
+        return new Error("Role mismatch");
+      }
+      const result = await UserService.checkAuth({
+        token: userInfo.token,
+        role: userInfo.role,
+      });
+      if (result instanceof Error) {
+        logout();
+        return result;
+      }
+      if (userInfo.id !== result) {
+        logout();
+        return new Error("User ID mismatch");
+      }
+    },
+    [logout, userInfo]
+  );
 
   const jumpDefault = useCallback(
     (givenUserInfo?: UserInfo) => {
@@ -75,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const storedUserInfo = localStorage.getItem("user");
-    if (storedUserInfo) setUserInfo(JSON.parse(storedUserInfo));
+    setUserInfo(storedUserInfo ? JSON.parse(storedUserInfo) : null);
   }, []);
 
   return (

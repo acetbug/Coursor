@@ -71,6 +71,13 @@ case class QueryCurriculaMessagePlanner(
   def plan: IO[List[Curriculum]] =
     Utils.queryCurricula(departmentId)
 
+case class QueryRecommendationsMessagePlanner(
+    departmentId: String,
+    stage: Stage
+) extends Planner[List[Recommendation]]:
+  def plan: IO[List[Recommendation]] =
+    Utils.queryRecommendations(departmentId, stage)
+
 case class QueryTeachingsMessagePlanner(
     teacherId: String,
     termId: String

@@ -74,6 +74,8 @@ object Utils:
       Planner.execute[QueryCurriculaMessagePlanner, List[Curriculum]](
         requestJson
       )
+    case "QueryRecommendationsMessage" =>
+      Planner.execute[QueryRecommendationsMessagePlanner, List[Recommendation]](requestJson)
     case "QueryTeachingsMessage" =>
       Planner.execute[QueryTeachingsMessagePlanner, List[Teaching]](requestJson)
     case "QueryCoursesMessage" =>
@@ -223,6 +225,34 @@ object Utils:
             )
         )
       .toList
+
+  def queryRecommendations(
+     departmentId: String,
+     stage: Stage
+  ): IO[List[Recommendation]] =
+    for rows <- readDBRows(
+        s"""
+          |SELECT r.id, r.subject_id, r.priority, s.name, s.credits
+          |FROM ${thisService.schema}.${thisService.recommendationTable} r
+          |JOIN ${thisService.schema}.${thisService.subjectTable} s
+          |ON r.subject_id = s.id
+          |WHERE r.department_id = ? AND r.stage = ?;
+        """.stripMargin,
+        List(
+          SqlParameter("Int", departmentId),
+          SqlParameter("String", stage.toString)
+        )
+      )
+    yield rows.map: row =>
+      Recommendation(
+        id = decodeField[Int](row, "id").toString,
+        subject = Subject(
+          id = decodeField[Int](row, "subject_id").toString,
+          name = decodeField[String](row, "name"),
+          credits = decodeField[Int](row, "credits")
+        ),
+        priority = decodeField[Int](row, "priority")
+      )
 
   def queryTeachings(teacherId: String, termId: String): IO[List[Teaching]] =
     for rows <- readDBRows(
